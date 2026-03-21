@@ -1,0 +1,67 @@
+const BTC_EL = document.getElementById('btc-price');
+const ETH_EL = document.getElementById('eth-price');
+const UPDATE_EL = document.getElementById('updated');
+const REFRESH_BTN = document.getElementById('refresh');
+const AUTOPOLL_CB = document.getElementById('autopoll');
+
+const API = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true';
+const DEFAULT_INTERVAL_MS = 60_000; // 60s
+
+let pollHandle = null;
+let intervalMs = DEFAULT_INTERVAL_MS;
+
+function formatUSD(n){
+  if(typeof n !== 'number' || Number.isNaN(n)) return '—';
+  return '$' + n.toLocaleString(undefined, {maximumFractionDigits: 2});
+}
+
+async function fetchPrices(){
+  try{
+    const resp = await fetch(API, {cache: 'no-cache'});
+    if(!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`);
+    const data = await resp.json();
+    const btc = data.bitcoin?.usd;
+    const eth = data.ethereum?.usd;
+    const btc24 = data.bitcoin?.usd_24h_change;
+    const eth24 = data.ethereum?.usd_24h_change;
+
+    BTC_EL.textContent = formatUSD(btc);
+    ETH_EL.textContent = formatUSD(eth);
+
+    BTC_EL.title = (typeof btc24 === 'number') ? `24h: ${btc24.toFixed(2)}%` : '';
+    ETH_EL.title = (typeof eth24 === 'number') ? `24h: ${eth24.toFixed(2)}%` : '';
+
+    UPDATE_EL.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
+  }catch(err){
+    UPDATE_EL.textContent = `Update failed`;
+    console.error('Price fetch error:', err);
+  }
+}
+
+function startPolling(){
+  stopPolling();
+  fetchPrices();
+  if(AUTOPOLL_CB.checked){
+    pollHandle = setInterval(fetchPrices, intervalMs);
+  }
+}
+
+function stopPolling(){
+  if(pollHandle) { clearInterval(pollHandle); pollHandle = null; }
+}
+
+REFRESH_BTN.addEventListener('click', () => { fetchPrices(); });
+
+AUTOPOLL_CB.addEventListener('change', () => {
+  if(AUTOPOLL_CB.checked) startPolling();
+  else stopPolling();
+});
+
+// Gentle visibility handling: when page hidden, stop polling to save battery; resume on visible.
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden) stopPolling();
+  else if(AUTOPOLL_CB.checked) startPolling();
+});
+
+// Start
+startPolling();
