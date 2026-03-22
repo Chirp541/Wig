@@ -1,0 +1,50 @@
+:root{
+  --bg:#f7f7f8;
+  --card:#fff;
+  --muted:#666;
+  --accent:#111;
+}
+
+html,body{height:100%}
+body{
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--bg);
+  margin:0;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing:antialiased;
+}
+
+#crypto-widget{
+  background:var(--card);
+  padding:18px;
+  border-radius:12px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  width:320px;
+  text-align:left;
+  box-sizing:border-box;
+}
+
+#crypto-widget h1{
+  margin:0 0 12px 0;
+  font-size:18px;
+  color:var(--accent);
+  text-align:center;
+}
+
+.pair{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee}
+.pair:last-of-type{border-bottom:0}
+.label{color:var(--muted);font-size:13px}
+.price{font-weight:700;font-size:16px}
+
+.meta{margin-top:12px;display:flex;justify-content:space-between;align-items:center}
+#updated{color:#999;font-size:12px}
+
+.controls{display:flex;gap:8px;align-items:center}
+#refresh{
+  padding:8px 12px;border-radius:8px;border:1px solid #ddd;background:#fafafa;cursor:pointer;font-size:13px;
+}
+.poll{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+input[type="checkbox"]{width:18px;height:18px}
